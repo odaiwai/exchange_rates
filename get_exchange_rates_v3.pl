@@ -43,6 +43,7 @@ if ( $firstrun == 1 ) {
 }
 
 if ( $backfill == 1) {
+	# get the rates for every date in the database
 	print "Getting Dates...\n" if $verbose;
 	my %timestamps;
 	foreach my $cur1 (@currencies) {
