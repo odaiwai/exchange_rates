@@ -21,7 +21,7 @@ my %timestamps;
 # add any dates on the command line - use the form yyyymmdd
 while (my $date = shift @ARGV) {
 	$timestamps{$date}++
-	
+
 }
 
 # Add today's date
@@ -34,7 +34,7 @@ if ( (keys %timestamps) == 0 ) {
 	$timestamps{$timestamp}++;
 }
 
-# For new running, make the tables and 
+# For new running, make the tables and
 if ( $firstrun == 1 ) {
 	my $result = drop_all_tables($db, "");
 	$result = make_tables($db);
@@ -62,11 +62,11 @@ for my $timestamp (@timestamps) {
 	my ($trans_mdydate, $rates_ref) = get_currency_rates($mdydate, @currencies);
 	my %rates = %$rates_ref;
 	print Dumper(%rates);
-	
+
 	# Get the timestamp for the transaction from an MDY date
 	my $trans_date = fix_date($trans_mdydate);
 	my $trans_timestamp = timestamp_from_date($trans_date);
-	
+
 	dbdo($db, "BEGIN", $verbose);
 	$transactions += add_rates_to_db($trans_timestamp, \@currencies, \%rates);
 	dbdo($db, "COMMIT", $verbose);
@@ -86,7 +86,7 @@ $db->disconnect;
 sub read_from_file {
 	my $db = shift;
 	my $file = shift;
-	
+
 	open( my $fh, "<", $file) or die "Caan't open $file. $!";
 	my @from = qw/USD HKD USD AUD USD USD USD/;
 	my @to   = qw/HKD IDR IDR IDR HKD PHP SGD/;
@@ -95,8 +95,8 @@ sub read_from_file {
 		chomp $line;
 		my ($date, @rates) = split ", ", $line;
 		my $idx = 0;
-		
-		my $timestamp = timestamp_from_date($date);	
+
+		my $timestamp = timestamp_from_date($date);
 		foreach my $rate (@rates) {
 			my $result = db_upsert($db,
 								   "Select Date, $to[$idx] from [$from[$idx]] where Date = \"$date\";",
@@ -104,10 +104,10 @@ sub read_from_file {
 								   "Update [$from[$idx]] SET $to[$idx] = $rate where Date = \"$date\";",
 								   $verbose);
 			$idx++;
-		}	
+		}
 	}
 	dbdo($db, "COMMIT", $verbose);
-	
+
 	close $fh;
 }
 
@@ -116,11 +116,11 @@ sub add_rates_to_db {
 	my $timestamp = shift;
 	my $currency_ref = shift;
 	my $rates_ref = shift;
-	
+
 	my @currencies = @$currency_ref;
 	my %rates = %$rates_ref;
 	my $date = date_from_timestamp($timestamp);
-	
+
 	my $transactions = 0;
 	foreach my $cur1 (@currencies) {
 		foreach my $cur2 (@currencies) {
@@ -135,7 +135,7 @@ sub add_rates_to_db {
 			$transactions++;
 		}
 	}
-	
+
 	return $transactions;
 }
 
@@ -143,10 +143,10 @@ sub get_currency_rates {
 	# given
 	my $date = shift;
 	my @currencies = @_;
-	
+
 	my %rates;
 	my $trans_mdydate;
-	
+
 	foreach my $cur1 (@currencies) {
 		print "Looking for $baseurl/$cur1/.../$date...\n" if $verbose;
 		foreach my $cur2 (@currencies) {
@@ -155,6 +155,7 @@ sub get_currency_rates {
 			} else {
 				my $curl_options = "--compressed --silent";
 				my $curl_cmd = "$curl_options $baseurl/$cur1/$cur2/$date";
+				#print "$curl_cmd\n";
 				#my @file = `curl $curl_cmd`;
 				open (my $infh, "-|", "curl $curl_cmd");
 				#foreach my $line (@file) {
@@ -175,8 +176,8 @@ sub get_currency_rates {
 					#	<td class="text-nowrap text-narrow-screen-wrap">76.7843 USD</td>
 					#	<td class="text-narrow-screen-hidden text-wrap">1,000,000 Indonesian Rupiahs in US Dollars is 76.7843 for 3/11/2016</td>
 					#</tr>
-					if ( ($line =~ /<\/i>(1,000,000) .* in .* is ([0-9.,]+) for ([0-9\/]+)<\/td>/) or
-						 ($line =~ /<\/i>(1,000,000) .* = ([0-9.,]+) .* on ([0-9\/]+)<\/td>/)) {
+					if ( ($line =~ />(1,000,000) .* in .* is ([0-9.,]+) for ([0-9\/]+)<\/td>/) or
+						 ($line =~ />(1,000,000) .* = ([0-9.,]+) .* on ([0-9\/]+)<\/td>/)) {
 						#print "$line\n";
 						my $cur1_amount = $1;
 						my $cur2_amount = $2;
@@ -219,7 +220,7 @@ sub make_tables {
 	my %tables= (
 		"Currencies" => "abbrev TEXT Primary Key, Country Text"
 		);
-	my @currencies = keys %countries; 
+	my @currencies = keys %countries;
 	for my $curr1 (@currencies) {
 		my $definition = "Timestamp Text Primary Key, Date TEXT";
 		for my $curr2 ( @currencies ) {
@@ -227,7 +228,7 @@ sub make_tables {
 		}
 		$tables{$curr1} = $definition;
 	}
-	
+
     foreach my $tablename (%tables) {
         if (exists $tables{$tablename} ) {
             my $command = "Create Table if not exists [$tablename] ($tables{$tablename})";
@@ -269,7 +270,7 @@ sub dbdo {
     my $db = shift;
     my $command = shift;
     my $verbose = shift;
- 
+
     if (length($command) > 1000000) {
         die "$command too long!";
     }
@@ -319,7 +320,7 @@ sub db_upsert {
 	my $cmd1 = shift;
 	my $cmd2 = shift;
 	my $verbose = shift;
-	
+
 	my @row = row_from_query($db, $check, $verbose);
 	my $results;
 	#print Dumper(@row) if $verbose;
