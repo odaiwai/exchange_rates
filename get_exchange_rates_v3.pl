@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 use strict;
 use warnings;
 use DBI;
@@ -14,7 +14,7 @@ my @currencies=qw(HKD USD IDR AUD PHP SGD EUR GBP CNY THB TWD);
 my $firstrun = 0;
 my $backfill = 0;
 my $verbose = 1;
-my $baseurl = "http://www.exchange-rates.org/Rate";
+my $baseurl = "https://www.exchange-rates.org/Rate";
 
 my %timestamps;
 
