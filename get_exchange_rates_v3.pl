@@ -149,6 +149,11 @@ sub get_currency_rates {
 
 	my %rates;
 	my $trans_mdydate;
+    my $grepdate = "";
+    if ($date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/ ) {
+        my ($year, $month, $date) = ($1, $2, $3);
+        $grepdate = "$year-" . int($month) . "-" . int($date);
+    }
 
 	foreach my $cur1 (@currencies) {
 		print "Looking for $baseurl/$cur1/.../$date...\n" if $verbose;
@@ -156,11 +161,12 @@ sub get_currency_rates {
 			if ($cur1 eq $cur2) {
 				$rates{$cur1.$cur2}=1.0;
 			} else {
-				my $curl_options = "--compressed --silent";
-				my $curl_cmd = "$curl_options $baseurl/$cur1/$cur2/$date";
-				print "$curl_cmd\n";
+                # my $curl_options = "--compressed --silent";
+                # my $curl_cmd = "$curl_options $baseurl/$cur1/$cur2/$date";
+                my $lynx_cmd = "-dump $baseurl/exchange-rate-history/$cur1-$cur2-$date";
+				print "$lynx_cmd\n" if $verbose;
 				#my @file = `curl $curl_cmd`;
-				open (my $infh, "-|", "curl $curl_cmd");
+				open (my $infh, "-|", "lynx $lynx_cmd");
 				#foreach my $line (@file) {
 				while (my $line = <$infh>) {
 					chomp $line;
@@ -191,6 +197,15 @@ sub get_currency_rates {
 						#print "$line\n";
 						print "\tRate for $cur1 to $cur2 is $cur2_amount for $cur1_amount on $trans_mdydate.\n";
 					}
+                    if ( $line =~ /^\s+([A-Za-z]+ [0-9]+, [0-9]{4}), ([0-9]{4}-[0-9]{1,2}-[0-9]{1,2})\s+1 ([A-Z]) = ([0-9.]+) ([A-Z]+) 1 ([A-Z]) = ([0-9.]+) ([A-Z]+)/ ){
+                        my $longdate = $1;
+                        my $shortdate = $2;
+                        my $cur_1 = $3;
+                        my $rate = $4;
+                        my $cur_2 = $5;
+                        $rates{$cur_1.$cur_2} = $rate;
+						print "\tRate for $cur_1 to $cur_2 is $rate on $longdate ($shortdate).\n";
+                    }
 
 				}
 				close $infh
@@ -361,6 +376,8 @@ sub mdydate_from_timestamp {
 	my $year  = substr($timestamp, 0, 4);
 	my $month = substr($timestamp, 4, 2);
 	my $day   = substr($timestamp, 6, 2);
-	my $date = sprintf("%02d", $month) . "-" . sprintf("%02d", $day) . "-" . sprintf("%04d", $year);
+    # my $date = sprintf("%02d", $month) . "-" . sprintf("%02d", $day) . "-" . sprintf("%04d", $year);
+    # Changed to below for site changes
+	my $date = sprintf("%04d", $year) . "-" . sprintf("%02d", $month) . "-" . sprintf("%02d", $day);
 	return $date;
 }
