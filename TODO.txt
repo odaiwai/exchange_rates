@@ -1,0 +1,5 @@
+# README
+
+## TODO
+ - Perl scripts has stopped working on 2023/04/08 due to external site changes
+ - Can try to bodge it to fix, but might be better off going to use https://exchangeratesapi.io/documentation/ instead
