@@ -7,7 +7,8 @@ use Data::Dumper;
 # script to get exchange rates
 # modified for Jakarta project 2016/03/16
 # modified to use a database 2019/03/17
-
+# This seems to have stopped working - website changed - on 20230406
+#
 my $db = DBI->connect("dbi:SQLite:dbname=exchange_rates.sqlite","","") or die DBI::errstr;
 
 my @currencies=qw(HKD USD IDR AUD PHP SGD EUR GBP CNY THB TWD);
@@ -18,6 +19,7 @@ my $baseurl = "https://www.exchange-rates.org/Rate";
 
 my %timestamps;
 
+print("Use date format YYYYMMDD to specify a date for checking\n");
 # add any dates on the command line - use the form yyyymmdd
 while (my $date = shift @ARGV) {
 	$timestamps{$date}++
@@ -156,7 +158,7 @@ sub get_currency_rates {
 			} else {
 				my $curl_options = "--compressed --silent";
 				my $curl_cmd = "$curl_options $baseurl/$cur1/$cur2/$date";
-				#print "$curl_cmd\n";
+				print "$curl_cmd\n";
 				#my @file = `curl $curl_cmd`;
 				open (my $infh, "-|", "curl $curl_cmd");
 				#foreach my $line (@file) {
