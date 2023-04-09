@@ -6,10 +6,11 @@
 
 # import os
 # import sys
-import json
-import requests
-import sqlite3
 from datetime import datetime
+from datetime import timedelta
+import json
+import sqlite3
+import requests
 
 api_errors = {404: ('The requested resource does not exist.'),
               101: ('No API Key was specified or an invalid API Key was '
@@ -39,6 +40,7 @@ api_errors = {404: ('The requested resource does not exist.'),
               505: ('The specified timeframe is too long, exceeding 365 days.'
                     ' [timeseries, fluctuation]')
               }
+error_keys = list(api_errors)
 
 
 def get_credentials():
@@ -54,7 +56,10 @@ def get_credentials():
     return credentials
 
 
-def get_latest_rates(base: str,  symbols: list, credentials: dict):
+def get_time_series_api(base: str,
+                        symbols: list,
+                        date: str,
+                        credentials: dict):
     """
     Use the APILAYER API to get the requested data
     Documentation from here:
@@ -63,16 +68,106 @@ def get_latest_rates(base: str,  symbols: list, credentials: dict):
         More reliable documentation here.
         https://apilayer.com/marketplace/exchangerates_data-api?e=Sign+Up&l=Success
     """
+    start_date = datetime.strftime(date - timedelta(365), '%Y-%m-%d')
+    end_date = datetime.strftime(date, '%Y-%m-%d')
     for_real = True
     symbol_list = ','.join(symbols)
     baseurl = 'https://api.apilayer.com/exchangerates_data'
-    url = (f'{baseurl}/latest?access_key={credentials["api-key"]}'
+    url = (f'{baseurl}/timeseries'
+           f'?access_key={credentials["api-key"]}'
+           f'&start_date={start_date}&end_date={end_date}'
            f'&base={base}&symbols={symbol_list}')
     headers = {'apikey': credentials['api-key']}
     if for_real:
         response = requests.get(url, headers=headers)
         status_code = response.status_code
-        if status_code in api_errors.keys():
+        if status_code in error_keys:
+            print(status_code, api_errors[status_code])
+
+        result = json.loads(response.text)
+    else:
+        # Return a dummy set for testing to save on api calls
+        result = {'success': True,
+                  'timestamp': 1680946803,
+                  'base': 'HKD',
+                  'date': '2023-04-08',
+                  'rates': {'HKD': 1,
+                            'USD': 0.127393,
+                            'AUD': 0.190936,
+                            'EUR': 0.115851,
+                            'GBP': 0.102393,
+                            'CNY': 0.875277,
+                            'THB': 4.3432
+                            }
+                  }
+    return result
+
+
+def return_sql_command_from_data(table: str, date: str, data: dict):
+    """
+    return the SQL command to INSERT OR IGNORE from a dict
+    of keys corresponding to a date.
+    """
+    date_obj = datetime.strptime(date, '%Y-%m-%d')
+    timestamp = datetime.strftime(date_obj, '%Y%m%d')
+    keys_list = data.keys()
+    keys = ', '.join(keys_list)
+    pars = ', '.join(['?'] * (2+len(keys_list)))
+    vals_list = data.values()
+    sql_cmd = (f'INSERT OR IGNORE INTO [{table}] '
+               f'(Timestamp, Date, {keys}) '
+               f'Values ({pars})')
+    # print(sql_cmd, (timestamp, date,) + tuple(vals_list))
+    return sql_cmd, (timestamp, date,) + tuple(vals_list)
+
+
+def get_time_series():
+    """
+    Get the time series data from the API, save a copy to disk
+    and insert or ignore into the database
+    """
+    currencies = 'HKD USD IDR AUD PHP SGD EUR GBP CNY THB TWD'.split(' ')
+    date = datetime.now()
+    credentials = get_credentials()
+    for currency in currencies:
+        print(currency, currencies)
+        result = get_time_series_api(currency, currencies, date, credentials)
+        db.execute('BEGIN')
+        with open(f'time_series_{currency}_20230409.json',
+                  'w',
+                  encoding='utf-8') as outfh:
+            print(json.dumps(result), file=outfh)
+            rates = result['rates']
+            for date in rates:
+                sql_cmd, data = return_sql_command_from_data(currency,
+                                                             date,
+                                                             rates[date])
+                print(sql_cmd, data)
+                db.execute(sql_cmd, data)
+
+        db.execute('COMMIT')
+
+
+def get_latest_rates(base: str,  symbols: list, credentials: dict):
+    """
+    Use the APILAYER API to get the requested data
+    Documentation from here:
+        https://exchangeratesapi.io/documentation/
+
+        More reliable documentation here.
+        https://apilayer.com/marketplace/exchangerates_data-api
+    """
+    for_real = True
+    symbol_list = ','.join(symbols)
+    baseurl = 'https://api.apilayer.com/exchangerates_data'
+    url = (f'{baseurl}/latest'
+           '?access_key={credentials["api-key"]}'
+           f'&base={base}&symbols={symbol_list}')
+    headers = {'apikey': credentials['api-key']}
+    if for_real:
+        response = requests.get(url, headers=headers)
+        status_code = response.status_code
+        if status_code in error_keys:
             print(status_code, api_errors[status_code])
 
         result = json.loads(response.text)
@@ -117,17 +212,14 @@ def main():
         rates = ', '.join([str(r) for r in rate_list])
         pars = ', '.join(['?'] * (2+len(curr_list)))
         print(timestamp, date, curr_list, rate_list)
-        sql_cmd = (f'INSERT INTO [{currency}] '
+        sql_cmd = (f'INSERT OR IGNORE INTO [{currency}] '
                    f'(Timestamp, Date, {currs}) '
                    f'Values ({pars})')
         print(sql_cmd, (timestamp, date, rates, ))
         db.execute("BEGIN")
-        db.execute(sql_cmd, (timestamp, date, ) +tuple(rate_list) )
+        db.execute(sql_cmd, (timestamp, date,) + tuple(rate_list))
         db.execute("COMMIT")
         # dbc.('INSERT INTO HKD (Timestamp, Date, c...) Values ()
-
-
-    return None
 
 
 if __name__ == '__main__':
