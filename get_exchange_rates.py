@@ -49,7 +49,7 @@ def get_credentials():
     """
 
     credentials = {}
-    with open('credentials.json', 'r', encoding='utf-8') as creds:
+    with open(f'{BASEDIR}/credentials.json', 'r', encoding='utf-8') as creds:
         credentials = json.loads(creds.read())
 
     print(credentials.keys())
@@ -223,8 +223,10 @@ def main():
 
 
 if __name__ == '__main__':
-    db_connection = sqlite3.connect('exchange_rates.sqlite')
-    db = db_connection.cursor()
+    BASEDIR = (r'/home/odaiwai/Documents/Transport_Planning/'
+               '99999999_exchange_rates_database')
+    db_con = sqlite3.connect(f'{BASEDIR}/exchange_rates.sqlite')
+    db = db_con.cursor()
     main()
     # Tidy up and close the connection
     db.close()
