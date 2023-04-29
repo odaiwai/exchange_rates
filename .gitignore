@@ -1,5 +1,9 @@
 *~
+*.swp
+.DS_Store
 dates.in
 *.sqlite
 #*.csv
 tags
+get_current_rates.pl
+query.out
