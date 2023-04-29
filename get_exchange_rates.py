@@ -52,7 +52,7 @@ def get_credentials():
     with open(f'{BASEDIR}/credentials.json', 'r', encoding='utf-8') as creds:
         credentials = json.loads(creds.read())
 
-    print(credentials.keys())
+    # print(credentials.keys())
     return credentials
 
 
@@ -128,6 +128,7 @@ def get_time_series():
     """
     currencies = 'HKD USD IDR AUD PHP SGD EUR GBP CNY THB TWD'.split(' ')
     date = datetime.now()
+    print('getting credentials...')
     credentials = get_credentials()
     for currency in currencies:
         print(currency, currencies)
@@ -196,7 +197,7 @@ def main():
     currencies = 'HKD USD IDR AUD PHP SGD EUR GBP CNY THB TWD'.split(' ')
     # currencies = 'HKD USD AUD EUR GBP CNY THB'.split(' ')
     credentials = get_credentials()
-    # print(credentials)
+    print(f'Credentials: {credentials}')
 
     for currency in currencies:
         result = get_latest_rates(currency, currencies, credentials)
