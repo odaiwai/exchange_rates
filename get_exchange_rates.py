@@ -41,6 +41,8 @@ api_errors = {404: ('The requested resource does not exist.'),
                     ' [timeseries, fluctuation]')
               }
 error_keys = list(api_errors)
+WORKDIR = (r'/home/odaiwai/Documents/Transport_Planning/'
+           '99999999_exchange_rates_database')
 
 
 def get_credentials():
@@ -109,7 +111,7 @@ def return_sql_command_from_data(table: str, date: str, data: dict):
     of keys corresponding to a date.
     """
     date_obj = datetime.strptime(date, '%Y-%m-%d')
-    timestamp = datetime.strftime(date_obj, '%Y%m%d')
+    timestamp = datetime.strftime(date_obj, '%Y-%m-%d')
     keys_list = data.keys()
     keys = ', '.join(keys_list)
     pars = ', '.join(['?'] * (2+len(keys_list)))
@@ -203,7 +205,7 @@ def main():
         result = get_latest_rates(currency, currencies, credentials)
         date = result['date']
         query_ts = datetime.fromtimestamp(result['timestamp'])
-        timestamp = datetime.strftime(query_ts, '%Y%m%d')
+        timestamp = datetime.strftime(query_ts, '%Y-%m-%d')
 
         print(result['rates'])
         curr_list = result['rates'].keys()
@@ -224,7 +226,7 @@ def main():
 
 
 if __name__ == '__main__':
-    db_connection = sqlite3.connect('exchange_rates.sqlite')
+    db_connection = sqlite3.connect(f'{WORKDIR}/exchange_rates.sqlite')
     db = db_connection.cursor()
     main()
     # Tidy up and close the connection
