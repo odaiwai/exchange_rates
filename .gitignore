@@ -13,3 +13,4 @@ get_current_rates.pl
 query.out
 rates.csv
 time_series_*.json
+credentials.json
