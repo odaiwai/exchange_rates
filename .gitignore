@@ -7,3 +7,4 @@ dates.in
 tags
 get_currency_rates.pl
 query.out
+time_series/
