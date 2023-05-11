@@ -140,6 +140,7 @@ def get_time_series(date: str, extent: int) -> None:
     and insert or ignore into the database
     """
     currencies = 'HKD USD IDR AUD PHP SGD EUR GBP CNY THB TWD'.split(' ')
+    ts_dir = f'{WORKDIR}/time_series'
     end_date = datetime.strptime(date, '%Y-%m-%d')
     timestamp = datetime.strftime(end_date, '%Y%m%d')
     if extent == 0:
@@ -155,7 +156,7 @@ def get_time_series(date: str, extent: int) -> None:
                                      credentials)
         if result is not None:
             db.execute('BEGIN')
-            with open(f'time_series_{currency}_{timestamp}.json',
+            with open(f'{ts_dir}/time_series_{currency}_{timestamp}.json',
                       'w',
                       encoding='utf-8') as outfh:
                 print(json.dumps(result), file=outfh)
