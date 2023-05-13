@@ -69,7 +69,7 @@ def get_time_series_api(base: str,
                         symbols: list,
                         date: str,
                         extent: int,
-                        credentials: dict):
+                        credentials: dict) -> dict | None:
     """
     Use the APILAYER API to get the requested data
     Documentation from here:
@@ -81,42 +81,47 @@ def get_time_series_api(base: str,
     # print(date)
     start_date = datetime.strftime(date - timedelta(extent), '%Y-%m-%d')
     end_date = datetime.strftime(date, '%Y-%m-%d')
-    for_real = True
     symbol_list = ','.join(symbols)
     baseurl = 'https://api.apilayer.com/exchangerates_data'
     url = (f'{baseurl}/timeseries'
-           f'?access_key={credentials["api-key"]}'
+           # f'?access_key={credentials["api-key"]}'
            f'&start_date={start_date}&end_date={end_date}'
            f'&base={base}&symbols={symbol_list}')
     # print(url)
+    data = get_data_from_api(url, credentials, True)
+    return data
+
+
+def get_data_from_api(url: str,
+                      credentials: dict,
+                      for_real: bool) -> dict | None:
+    """
+    Make a call to the API with a url and return the data from it.
+    """
     headers = {'apikey': credentials['api-key']}
     if for_real:
-        response = requests.get(url, headers=headers)
-        status_code = response.status_code
-        if status_code in error_keys:
-            print(status_code,
-                  api_errors[status_code],
+        # print(url, headers)
+        response = requests.get(url, headers)
+        if response.status_code in error_keys:
+            print(response.status_code,
+                  api_errors[response.status_code],
                   response,
-                  response.text)
+                  json.loads(response.content.decode()))
             return None
+        # No status code in the error list
+        # Must be a successful
+        return json.loads(response.text)
 
-        result = json.loads(response.text)
-    else:
-        # Return a dummy set for testing to save on api calls
-        result = {'success': True,
-                  'timestamp': 1680946803,
-                  'base': 'HKD',
-                  'date': '2023-04-08',
-                  'rates': {'HKD': 1,
-                            'USD': 0.127393,
-                            'AUD': 0.190936,
-                            'EUR': 0.115851,
-                            'GBP': 0.102393,
-                            'CNY': 0.875277,
-                            'THB': 4.3432
-                            }
-                  }
-    return result
+    # Return a dummy set for testing to save on api calls
+    return {'success': True,
+            'timestamp': 1680946803,
+            'base': 'HKD',
+            'date': '2023-04-08',
+            'rates': {'HKD': 1,
+                      'USD': 0.127393, 'AUD': 0.190936, 'EUR': 0.115851,
+                      'GBP': 0.102393, 'CNY': 0.875277, 'THB': 4.3432
+                      }
+            }
 
 
 def sql_command_from_data(table: str, date: str, data: dict):
@@ -186,39 +191,14 @@ def get_latest_rates(base: str,
         More reliable documentation here.
         https://apilayer.com/marketplace/exchangerates_data-api
     """
-    for_real = True
     symbol_list = ','.join(symbols)
     baseurl = 'https://api.apilayer.com/exchangerates_data'
     url = (f'{baseurl}/latest'
-           '?access_key={credentials["api-key"]}'
            f'&base={base}&symbols={symbol_list}')
-    headers = {'apikey': credentials['api-key']}
-    if for_real:
-        response = requests.get(url, headers=headers)
-        if response.status_code in error_keys:
-            print(response.status_code,
-                  api_errors[response.status_code],
-                  response,
-                  json.loads(response.content.decode()))
-            return None
-        # No status code in the error list
-        # Must be a successfull
-        return json.loads(response.text)
-    else:
-        # Return a dummy set for testing to save on api calls
-        return {'success': True,
-                'timestamp': 1680946803,
-                'base': 'HKD',
-                'date': '2023-04-08',
-                'rates': {'HKD': 1,
-                          'USD': 0.127393,
-                          'AUD': 0.190936,
-                          'EUR': 0.115851,
-                          'GBP': 0.102393,
-                          'CNY': 0.875277,
-                          'THB': 4.3432
-                          }
-                }
+    print(url)
+    data = get_data_from_api(url, credentials, True)
+    print(data)
+    return data
 
 
 def main(args):
@@ -255,7 +235,7 @@ def main(args):
                 db.execute("COMMIT")
                 # dbc.('INSERT INTO HKD (Timestamp, Date, c...) Values ()
     elif len(args) == 2:
-        end_date = datetime.strftime('%Y-%m-%d', datetime.now())
+        end_date = datetime.strftime(datetime.now(), '%Y-%m-%d')
         get_time_series(end_date, int(sys.argv[1]))
     elif len(args) == 3:
         get_time_series(sys.argv[1], int(sys.argv[2]))
