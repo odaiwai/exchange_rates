@@ -3,11 +3,17 @@
 Utility to retrieve the Exchanges Rates for a number of currencies every week/day
 
 Was in Perl, relying on WebScraping, but that stopped working in 2023, so re-written
-in Python using a free API with limited accesses.
+in Python using a free API with limited accesses per month;
+
+## Credentials
+to sign-up for the API key, go here: https://apilayer.com/marketplace/exchangerates_data-api 
+and complete the sign-up process. For such a low-volume task as this one, the 
+free tier is fine.
 
 ## Completed Tasks
  - Perl scripts has stopped working on 2023/04/08 due to external site changes
- - Can try to bodge it to fix, but might be better off going to use https://exchangeratesapi.io/documentation/ instead
+ - Replaced with Python utility and API access from here: 
+ - https://exchangeratesapi.io/documentation/ instead
 
 ## TODO:
 Task to be undertaken in the future
