@@ -27,8 +27,6 @@ api_errors = {101: ('No API Key was specified or an invalid API Key was '
               105: ('The current subscription plan does not support this API '
                     'endpoint.'),
               106: ('The current request did not return any results.'),
-              102: ('The account this API request is coming from is '
-                    'inactive.'),
               201: ('An invadid base currency has been entered.'),
               202: ('One or more invalid symbols have been specified.'),
               301: ('No date has been specified. [historical]'),
@@ -115,7 +113,7 @@ def get_data_from_api(url: str,
         return json.loads(response.text)
 
     # Return a dummy set for testing to save on api calls
-        result = {'success': True,
+    return {'success': True,
             'timestamp': 1680946803,
             'base': 'HKD',
             'date': '2023-04-08',
