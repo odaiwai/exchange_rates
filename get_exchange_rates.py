@@ -94,7 +94,10 @@ def get_time_series_api(base: str,
         response = requests.get(url, headers=headers)
         status_code = response.status_code
         if status_code in error_keys:
-            print(status_code, api_errors[status_code], response)
+            print(status_code,
+                  api_errors[status_code],
+                  response,
+                  response.text)
             return None
 
         result = json.loads(response.text)
@@ -116,7 +119,7 @@ def get_time_series_api(base: str,
     return result
 
 
-def return_sql_command_from_data(table: str, date: str, data: dict):
+def sql_command_from_data(table: str, date: str, data: dict):
     """
     return the SQL command to INSERT OR IGNORE from a dict
     of keys corresponding to a date.
@@ -162,9 +165,9 @@ def get_time_series(date: str, extent: int) -> None:
                 print(json.dumps(result), file=outfh)
                 rates = result['rates']
                 for thisdate in rates:
-                    sql_cmd, data = return_sql_command_from_data(currency,
-                                                                 thisdate,
-                                                                 rates[date])
+                    sql_cmd, data = sql_command_from_data(currency,
+                                                          thisdate,
+                                                          rates[date])
                     print(sql_cmd, data)
                     result = db.execute(sql_cmd, data)
                     print(result)
@@ -172,7 +175,9 @@ def get_time_series(date: str, extent: int) -> None:
             db.execute('COMMIT')
 
 
-def get_latest_rates(base: str,  symbols: list, credentials: dict):
+def get_latest_rates(base: str,
+                     symbols: list,
+                     credentials: dict) -> dict | None:
     """
     Use the APILAYER API to get the requested data
     Documentation from here:
@@ -190,28 +195,30 @@ def get_latest_rates(base: str,  symbols: list, credentials: dict):
     headers = {'apikey': credentials['api-key']}
     if for_real:
         response = requests.get(url, headers=headers)
-        status_code = response.status_code
-        if status_code in error_keys:
-            print(status_code, api_errors[status_code], response)
+        if response.status_code in error_keys:
+            print(response.status_code,
+                  api_errors[response.status_code],
+                  response,
+                  json.loads(response.content.decode()))
             return None
-
-        result = json.loads(response.text)
+        # No status code in the error list
+        # Must be a successfull
+        return json.loads(response.text)
     else:
         # Return a dummy set for testing to save on api calls
-        result = {'success': True,
-                  'timestamp': 1680946803,
-                  'base': 'HKD',
-                  'date': '2023-04-08',
-                  'rates': {'HKD': 1,
-                            'USD': 0.127393,
-                            'AUD': 0.190936,
-                            'EUR': 0.115851,
-                            'GBP': 0.102393,
-                            'CNY': 0.875277,
-                            'THB': 4.3432
-                            }
-                  }
-    return result
+        return {'success': True,
+                'timestamp': 1680946803,
+                'base': 'HKD',
+                'date': '2023-04-08',
+                'rates': {'HKD': 1,
+                          'USD': 0.127393,
+                          'AUD': 0.190936,
+                          'EUR': 0.115851,
+                          'GBP': 0.102393,
+                          'CNY': 0.875277,
+                          'THB': 4.3432
+                          }
+                }
 
 
 def main(args):
