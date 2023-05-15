@@ -1,34 +1,3 @@
-<<<<<<< HEAD
-# README
-
-Utility to retrieve the Exchanges Rates for a number of currencies every week/day
-
-Was in Perl, relying on WebScraping, but that stopped working in 2023, so re-written
-in Python using a free API with limited accesses per month;
-
-## Credentials
-to sign-up for the API key, go here: https://apilayer.com/marketplace/exchangerates_data-api 
-and complete the sign-up process. For such a low-volume task as this one, the 
-free tier is fine.
-Credentials are stored in a `credentials.json` file, which is not in the repo, for 
-obvious reasons. This file is of the form:
-
-    {
-        "api-key": "[REDACTED]"
-    }
-
-## Completed Tasks
- - Perl scripts has stopped working on 2023/04/08 due to external site changes
- - Replaced with Python utility and API access from here: 
- - https://exchangeratesapi.io/documentation/ instead
-
-## TODO:
-Task to be undertaken in the future
-1. infill the earlier dates with:
-
-    for year in `seq 2006 2015`; do ./get_exchange_rates.py $year-12-31 365; done
-||||||| db6a3d3
-=======
 # README
 
 Utility to retrieve the Exchanges Rates for a number of currencies every week/day
@@ -60,5 +29,3 @@ Task to be undertaken in the future
     for year in `seq 2006 2015`; do ./get_exchange_rates.py $year-12-31 365; done
 2.
 3.
-
->>>>>>> developPythonUtility
