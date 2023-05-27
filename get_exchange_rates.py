@@ -102,11 +102,11 @@ def get_data_from_api(url: str,
     if for_real:
         # print(url, headers)
         response = requests.get(url, headers)
+        print(f'Code: {response.status_code}')
         if response.status_code in error_keys:
-            print(response.status_code,
-                  api_errors[response.status_code],
-                  response,
-                  json.loads(response.content.decode()))
+            api_response = json.loads(response.content.decode())
+            print(f'{api_errors[response.status_code]}\n',
+                  f'{api_response["message"]}')
             return None
         # No status code in the error list
         # Must be a successful
@@ -197,7 +197,6 @@ def get_latest_rates(base: str,
            f'&base={base}&symbols={symbol_list}')
     print(url)
     data = get_data_from_api(url, credentials, True)
-    print(data)
     return data
 
 
