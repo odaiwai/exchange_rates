@@ -24,8 +24,8 @@ This credential will be given when you register for the API service.
 
 ## TODO:
 Task to be undertaken in the future
-1. infill the earlier dates with:
+1. infill the earlier dates with: - Done
 
     `for year in $(seq 2006 2015); do ./get_exchange_rates.py $year-12-31 365; done`
-2. Tidy up the API response. - done
-3.
+2. Tidy up the API response. - Done
+3. Remove the credentials from the Development Branch - Done
