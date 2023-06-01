@@ -5,8 +5,14 @@ dates.in
 *.sqlite
 #*.csv
 tags
+get_currency_rates.pl
+query.out
+time_series/
+rates.csv
 get_current_rates.pl
 query.out
 rates.csv
 time_series_*.json
+# credentials.json
 *.swo
+project_rates.csv
