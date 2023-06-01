@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-    Script to do stuff in Python.
+    Use the API to get exchange rate data and put it in a database.
 
     Manage the Connections and the APP
     Usage:
         With no arguments, get todays exchange rates from the api
-        with any argument, get the time series data and infill.
+        With one argument, treat the argument as a number of days to get
+        results for
+        with two arguments, treat the first argument as a dat, and the second
+        as a number of days and get a time series.
 """
 
 # import os
