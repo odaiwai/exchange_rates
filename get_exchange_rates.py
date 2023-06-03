@@ -104,7 +104,7 @@ def get_data_from_api(url: str,
     headers = {'apikey': credentials['api-key']}
     if for_real:
         # print(url, headers)
-        response = requests.get(url, headers)
+        response = requests.get(url, headers, timeout=30)
         print(f'Code: {response.status_code}')
         if response.status_code in error_keys:
             api_response = json.loads(response.content.decode())
@@ -201,6 +201,23 @@ def get_latest_rates(base: str,
     print(url)
     data = get_data_from_api(url, credentials, True)
     return data
+
+
+def create_tables():
+    """
+    create the tables and indices in case of restarting from scratch
+    """
+    currencies = 'HKD USD IDR AUD PHP SGD EUR GBP CNY THB TWD'.split(' ')
+    curr_schema = ', '.join([f'{curr} REAL' for curr in currencies])
+    for currency in currencies:
+        sql_cmd = (f'CREATE TABLE [{currency}] ('
+                   'TIMESTAMP TEXT UNIQUE PRIMARY KEY, '
+                   f'DATE TEXT, {curr_schema})')
+        db.execute("BEGIN")
+        db.execute(sql_cmd)
+        db.execute((f'CREATE UNIQUE INDEX {currency}_IDX '
+                    f'ON {currency} (TIMESTAMP)'))
+        db.execute("COMMIT")
 
 
 def main(args):
