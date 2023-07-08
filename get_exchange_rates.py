@@ -267,9 +267,7 @@ def main(args):
 
 
 if __name__ == '__main__':
-    db_connection = sqlite3.connect(f'{WORKDIR}/exchange_rates.sqlite')
-    db = db_connection.cursor()
-    main(sys.argv)
+    with sqlite3.connect(f'{WORKDIR}/exchange_rates.sqlite') as connect:
+        db = connect.cursor()
+        main(sys.argv)
 
-    # Close the connection
-    db.close()
