@@ -53,7 +53,7 @@ api_errors = {101: ('No API Key was specified or an invalid API Key was '
 error_keys = list(api_errors)
 WORKDIR = pathlib.Path(__file__).parent.resolve()
 print(f'{WORKDIR}')
-
+TS_STRFT = '%Y%m%d'
 
 def get_credentials():
     """
@@ -133,7 +133,7 @@ def sql_command_from_data(table: str, date: str, data: dict):
     of keys corresponding to a date.
     """
     date_obj = datetime.strptime(date, '%Y-%m-%d')
-    timestamp = datetime.strftime(date_obj, '%Y%m%d')
+    timestamp = datetime.strftime(date_obj, TS_STRFT )
     keys_list = data.keys()
     keys = ', '.join(keys_list)
     pars = ', '.join(['?'] * (2+len(keys_list)))
@@ -153,7 +153,7 @@ def get_time_series(date: str, extent: int) -> None:
     currencies = 'HKD USD IDR AUD PHP SGD EUR GBP CNY THB TWD'.split(' ')
     ts_dir = f'{WORKDIR}/time_series'
     end_date = datetime.strptime(date, '%Y-%m-%d')
-    timestamp = datetime.strftime(end_date, '%Y%m%d')
+    timestamp = datetime.strftime(end_date, TS_STRFT)
     if extent == 0:
         extent = 365
     print(f'Time Series ({date} {extent}): getting credentials...')
@@ -235,7 +235,7 @@ def main(args):
             if result is not None:
                 date = result['date']
                 query_ts = datetime.fromtimestamp(result['timestamp'])
-                timestamp = datetime.strftime(query_ts, '%Y-%m-%d')
+                timestamp = datetime.strftime(query_ts, TS_STRFT)
 
                 print(result['rates'])
                 curr_list = result['rates'].keys()
