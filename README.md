@@ -21,6 +21,7 @@ This credential will be given when you register for the API service.
  - Perl scripts has stopped working on 2023/04/08 due to external site changes
  - Replaced with Python utility and API access from here: 
  - https://exchangeratesapi.io/documentation/ instead
+
 1. infill the earlier dates with: - Done
 
     `for year in $(seq 2006 2015); do ./get_exchange_rates.py $year-12-31 365; done`
@@ -28,8 +29,7 @@ This credential will be given when you register for the API service.
 3. Remove the credentials from the Development Branch - Done
 4. Normalize the timestamp - it should be '%Y%m%d_%H%M%S' everywhere - Done
 
-## TODO:
-Task to be undertaken in the future
+## TODO: Tasks to be undertaken in the future
 5. Deal with some of the older entries having identical timestamps and
    different data. This is due to multiple retrievals on the same day, but the
    older data only recorded the timestamp to the nearest day. - Pending
