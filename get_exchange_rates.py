@@ -53,7 +53,8 @@ api_errors = {101: ('No API Key was specified or an invalid API Key was '
 error_keys = list(api_errors)
 WORKDIR = pathlib.Path(__file__).parent.resolve()
 print(f'{WORKDIR}')
-TS_STRFT = '%Y%m%d'
+TS_STRFT = '%Y%m%d_%H%M%S'
+DT_STRFT = '%Y-%m-%d %H:%M:%S'
 
 def get_credentials():
     """
@@ -132,8 +133,9 @@ def sql_command_from_data(table: str, date: str, data: dict):
     return the SQL command to INSERT OR IGNORE from a dict
     of keys corresponding to a date.
     """
-    date_obj = datetime.strptime(date, '%Y-%m-%d')
-    timestamp = datetime.strftime(date_obj, TS_STRFT )
+    date_obj = datetime.strptime(data['date'], '%Y-%m-%d')
+    ts_obj = datetime.fromtimestamp(data['timestamp'])
+    timestamp = datetime.strftime(ts_obj, TS_STRFT )
     keys_list = data.keys()
     keys = ', '.join(keys_list)
     pars = ', '.join(['?'] * (2+len(keys_list)))

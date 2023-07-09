@@ -29,4 +29,5 @@ Task to be undertaken in the future
     `for year in $(seq 2006 2015); do ./get_exchange_rates.py $year-12-31 365; done`
 2. Tidy up the API response. - Done
 3. Remove the credentials from the Development Branch - Done
-4. Normalize the timestamp - it should be yyyymmdd everywhere
+4. Normalize the timestamp - it should be '%Y%m%d_%H%M%S' everywhere - Done
+5. Deal with some of the older entries having identical timestamps and different data. This is due to multiple retrievals on the same day, but the older data only recorded the timestamp to the nearest day. - Pending
