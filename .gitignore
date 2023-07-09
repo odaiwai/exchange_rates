@@ -16,3 +16,6 @@ time_series_*.json
 credentials.json
 *.swo
 project_rates.csv
+temp.*
+out.log
+backup.sql
