@@ -21,12 +21,12 @@ This credential will be given when you register for the API service.
  - Perl scripts has stopped working on 2023/04/08 due to external site changes
  - Replaced with Python utility and API access from here: 
  - https://exchangeratesapi.io/documentation/ instead
-
-## TODO:
-Task to be undertaken in the future
 1. infill the earlier dates with: - Done
 
     `for year in $(seq 2006 2015); do ./get_exchange_rates.py $year-12-31 365; done`
 2. Tidy up the API response. - Done
 3. Remove the credentials from the Development Branch - Done
 4. Normalize the timestamp - it should be yyyymmdd everywhere - done
+
+## TODO:
+Task to be undertaken in the future
