@@ -6,10 +6,10 @@ Was in Perl, relying on WebScraping, but that stopped working in 2023, so
 re-written in Python using a free API with limited accesses per month;
 
 ## Credentials
-to sign-up for the API key, go here: https://apilayer.com/marketplace/exchangerates_data-api 
-and complete the sign-up process. For such a low-volume task as this one, the 
+to sign-up for the API key, go here: https://apilayer.com/marketplace/exchangerates_data-api
+and complete the sign-up process. For such a low-volume task as this one, the
 free tier is fine, with 250 requests per month.
-Credentials are stored in a `credentials.json` file, which is not in the repo, for 
+Credentials are stored in a `credentials.json` file, which is not in the repo, for
 obvious reasons. This file is of the form:
 
     {
@@ -19,7 +19,7 @@ This credential will be given when you register for the API service.
 
 ## Completed Tasks
  - Perl scripts has stopped working on 2023/04/08 due to external site changes
- - Replaced with Python utility and API access from here: 
+ - Replaced with Python utility and API access from here:
  - https://exchangeratesapi.io/documentation/ instead
 
 1. infill the earlier dates with: - Done
@@ -30,6 +30,7 @@ This credential will be given when you register for the API service.
 4. Normalize the timestamp - it should be '%Y%m%d_%H%M%S' everywhere - Done
 
 ## TODO: Tasks to be undertaken in the future
-5. Deal with some of the older entries having identical timestamps and
+5. Sort out the sorting on date when combining.
+6. Deal with some of the older entries having identical timestamps and
    different data. This is due to multiple retrievals on the same day, but the
    older data only recorded the timestamp to the nearest day. - Pending
