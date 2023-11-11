@@ -5,10 +5,9 @@ Select DISTINCT HKD.Date,
         AUD.HKD as AUD,
         EUR.HKD as EUR,
         GBP.HKD as GBP
-    from HKD 
-    join USD using(timestamp) 
-    join aud using(timestamp) 
-    join eur using(timestamp) 
-    join gbp using(timestamp)
-    WHERE timestamp > 20120000
+    from HKD
+    join USD using(date)
+    join aud using(date)
+    join eur using(date)
+    join gbp using(date)
     order by HKD.Date asc

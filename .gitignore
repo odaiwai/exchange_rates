@@ -19,3 +19,5 @@ project_rates.csv
 temp.*
 out.log
 backup.sql
+._*
+output.log
